@@ -157,5 +157,22 @@ namespace HumanResources.Data.Services
                 .FirstOrDefaultAsync(e => e.ShiftId == shiftId);
         }
         #endregion
+
+        #region Department Object
+        public async Task<DataSourceResult> ReadDepartmentsByQueryArg(DataSourceRequest queryAttrib)
+        {
+            queryAttrib.Filters.Add(new FilterDescriptor
+            {
+                Member = "DepartmentId"
+            });
+
+            var departments = await _dbContext.Departments
+                .Where(e => e.DepartmentId > 1)
+                .OrderBy(e => e.Name)
+                .ToDataSourceResultAsync(queryAttrib);
+
+            return departments;
+        }
+        #endregion
     }
 }

@@ -1,5 +1,59 @@
-﻿<h3>Departments Card</h3>
+﻿<h3 style="text-align:center">DEPARTMENTS</h3>
+
+<br />
+<TelerikGrid @ref="@GridRef"
+             TItem="Department"
+             OnRead="@ReadItems"
+             Pageable="true"
+             Sortable="true"
+             FilterMode="GridFilterMode.FilterMenu"
+             Resizable="true"
+             PageSize="20"
+             Navigable="true">
+    <GridColumns>
+        <GridColumn Visible="false" Field="@nameof(departmentObj.DepartmentId)" Id="@DepartmentId" />
+        <GridColumn Field="@nameof(departmentObj.Name)" Title="Team Name" Width="100px" />
+        <GridColumn Field="@nameof(departmentObj.GroupName)" Title="Department Name" Width="100px" />
+    </GridColumns>
+</TelerikGrid>
 
 @code {
+
+    [Parameter]
+    public string? DepartmentId { get; set; }
+
+    public Department departmentObj = new Department();
+
+    public List<Department>? GridData { get; set; }
+
+    public List<Department>? SourceData { get; set; }
+
+    public TelerikGrid<Department>? GridRef { get; set; }
+
+
+    protected override void OnInitialized()
+    {
+        LoadData();
+    }
+
+    private void LoadData()
+    {
+        SourceData = new List<Department>();
+        GridData = new List<Department>(SourceData);
+    }
+
+    protected async Task ReadItems(GridReadEventArgs args)
+    {
+        DataSourceResult result = await service.ReadDepartmentsByQueryArg(args.Request);
+
+        var data = new DataEnvelope<Department>
+        {
+            CurrentPageData = result.Data.OfType<Department>().ToList(),
+            TotalItemCount = result.Total
+        };
+
+        args.Data = data.CurrentPageData;
+        args.Total = data.TotalItemCount;
+    }
 
 }
