@@ -2,6 +2,8 @@
 using HumanResources.Data.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using System;
+using Telerik.DataSource;
+using Telerik.DataSource.Extensions;
 
 namespace HumanResources.Data.Services
 {
@@ -15,13 +17,53 @@ namespace HumanResources.Data.Services
         }
 
         #region Employees View Object
+        public async Task<DataSourceResult> ReadVEmployeesByQueryArg(DataSourceRequest queryAttrib)
+        {
+            queryAttrib.Filters.Add(new FilterDescriptor
+            {
+                Member = "BusinessEntityId"
+            });
+
+            var employees = await _dbContext.VEmployees
+                .Where(e => e.BusinessEntityId > 1)
+                .OrderByDescending(e => e.BusinessEntityId)
+                .ToDataSourceResultAsync(queryAttrib);
+
+            return employees;
+        }
+
         public async Task<List<VEmployee>> GetEmployees_View()
         {
             return await _dbContext.VEmployees.ToListAsync();
         }
+
+        public VEmployee GetEmployee_View(int businessEntityId) 
+        {
+            var data = _dbContext.VEmployees
+                .Where(e => e.BusinessEntityId == businessEntityId)
+                .FirstOrDefault();
+
+            return data;
+        }
         #endregion
 
         #region Employee Object
+
+        public async Task<DataSourceResult> ReadEmployeesByQueryArg(DataSourceRequest queryAttrib)
+        {
+            queryAttrib.Filters.Add(new FilterDescriptor
+            {
+                Member = "CurrentFlag",
+                Value = true
+            });
+
+            var employees = await _dbContext.Employees
+                .Where(e => e.CurrentFlag == true)
+                .OrderByDescending(e => e.ModifiedDate)
+                .ToDataSourceResultAsync(queryAttrib);
+
+            return employees;
+        }
         public async Task<IEnumerable<Employee>> GetEmployees()
         {
             return await _dbContext.Employees.ToListAsync();

@@ -1,7 +1,7 @@
 ﻿@page "/ReadOnly/EmployeeDetails/{BusinessEntityId:int}"
 <h3>Employee Details</h3>
 
-<div class="demo-section">
+@*<div class="demo-section">
     <TelerikForm Model="@Employee">
         <FormItems>
             <FormItem Field="@nameof(Employee.BirthDate)" Enabled="false"></FormItem>
@@ -12,7 +12,7 @@
             <FormItem Field="@nameof(Employee.SickLeaveHours)" Enabled="false" />
         </FormItems>
     </TelerikForm>
-</div>
+</div>*@
 
 @code {
     public Employee? Employee { get; set; }

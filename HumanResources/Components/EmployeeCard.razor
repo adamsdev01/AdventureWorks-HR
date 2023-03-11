@@ -1,51 +1,178 @@
 ﻿<h3 style="text-align:center">EMPLOYEES</h3>
 
 <br />
-<TelerikGrid Class="grid"
-             Data=@VEmployees
-             ConfirmDelete="true"
+<TelerikGrid @ref="@GridRef"
+             TItem="VEmployee"
+             OnRead="@ReadItems"
+             OnStateInit="@((GridStateEventArgs<VEmployee> args) => OnStateInitHandler(args))"
              Pageable="true"
-             Groupable="true"
              Sortable="true"
              FilterMode="GridFilterMode.FilterMenu"
              Resizable="true"
              Reorderable="true"
-             EditMode="GridEditMode.Popup"
              PageSize="10"
              Navigable="true">
     <GridColumns>
-        <GridColumn Field="@nameof(VEmployee.FirstName)" Title="First Name" Width="195px" />
-        <GridColumn Field="@nameof(VEmployee.LastName)" Title="Last Name" Width="195px" />
-        <GridColumn Field="@nameof(VEmployee.JobTitle)" Title="Job Title" Width="195px" />
-        <GridColumn Field="@nameof(VEmployee.PhoneNumber)" Title="Phone Number" Width="195px" />
-        <GridColumn Field="@nameof(VEmployee.PhoneNumberType)" Title="Type" Width="100px" />
-        <GridColumn Field="@nameof(VEmployee.EmailAddress)" Title="Email Address" Width="195px" />
-        <GridCommandColumn Width="100px">
-            <GridCommandButton OnClick="(() => OnClickRead())" Id="BusinessEntityId" Icon="eye" ThemeColor="@ThemeConstants.Button.ThemeColor.Warning"></GridCommandButton>
-            <GridCommandButton Command="Edit" Icon="pencil" ThemeColor="@ThemeConstants.Button.ThemeColor.Primary"></GridCommandButton>
-            <GridCommandButton Command="Delete" Icon="trash" ThemeColor="@ThemeConstants.Button.ThemeColor.Error"></GridCommandButton>
+        <GridColumn Visible="false" Field="@nameof(model.BusinessEntityId)" Id="@BusinessEntityId" />
+        <GridColumn Field="@nameof(model.FirstName)" Title="First Name" Width="195px" />
+        <GridColumn Field="@nameof(model.LastName)" Title="Last Name" Width="195px" />
+        <GridColumn Field="@nameof(model.JobTitle)" Title="Job Title" Width="195px" />
+        <GridColumn Field="@nameof(model.PhoneNumber)" Title="Phone Number" Width="195px" />
+        <GridColumn Field="@nameof(model.PhoneNumberType)" Title="Type" Width="100px" />
+        <GridColumn Field="@nameof(model.EmailAddress)" Title="Email Address" Width="195px" />
+        <GridCommandColumn Width="100px" Reorderable="false">
+            <GridCommandButton OnClick="@GridReadHandler" Id="@BusinessEntityId" Icon="eye" ThemeColor="@ThemeConstants.Button.ThemeColor.Warning"></GridCommandButton>
+            <GridCommandButton OnClick="@GridEditHandler" Id="@BusinessEntityId" Icon="pencil" ThemeColor="@ThemeConstants.Button.ThemeColor.Primary"></GridCommandButton>
+            <GridCommandButton OnClick="@((args) => { GridDeleteHandler(args.Item as VEmployee); DeleteWindowVisible = true; })" Id="@BusinessEntityId" Icon="trash" ThemeColor="@ThemeConstants.Button.ThemeColor.Error"></GridCommandButton>
         </GridCommandColumn>
     </GridColumns>
 </TelerikGrid>
+<!-- Delete -->
+<TelerikWindow Modal="true"
+               Class="delete-window"
+               @bind-Visible="@DeleteWindowVisible"
+               Width="500px"
+               Height="350px">
+    <WindowTitle>
+        <strong>Delete Employee?</strong>
+    </WindowTitle>
+    <WindowContent>
+        <div>
+            <TelerikForm Model="@model">
+                <FormItems>
+                    <div>
+                        <input id="@BusinessEntityId" type="hidden" />
+                    </div>
+                    <div class="container">
+                        <h5>Deleting Employee <b>@selectedVEmployee?.FirstName @selectedVEmployee?.LastName</b></h5>
+                        <p>Are you sure you want to delete this record?</p>
+                    </div>
+                </FormItems>
+                <FormButtons>
+                    <TelerikButton Icon="trash" OnClick="@((args) => DeleteRecord(BusinessEntityId))" Class="deleteButton-colored-icons">Yes</TelerikButton>
+                    <TelerikButton Icon="cancel" OnClick="CancelDelete">No</TelerikButton>
+                </FormButtons>
+            </TelerikForm>
+        </div>
+
+    </WindowContent>
+</TelerikWindow>
 
 @code {
-    public List<VEmployee>? VEmployees { get; set; }
 
     [Parameter]
-    public int BusinessEntityId { get; set; }
+    public string? BusinessEntityId { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    public VEmployee model = new VEmployee();
+
+    public VEmployee? selectedVEmployee { get; set; }
+
+    public Employee? selectedEmployee { get; set; }
+
+    public List<VEmployee>? GridData { get; set; }
+
+    public List<VEmployee>? SourceData { get; set; }
+
+    public TelerikGrid<VEmployee>? GridRef { get; set; }
+
+    public bool DeleteWindowVisible { get; set; }
+
+    protected override void OnInitialized()
     {
-        await LoadData();
+        LoadData();
     }
 
-    private async Task LoadData()
+    private void LoadData()
     {
-        VEmployees = await service.GetEmployees_View();
+        SourceData = new List<VEmployee>();
+        GridData = new List<VEmployee>(SourceData);
     }
 
-    public void OnClickRead()
+    protected async Task ReadItems(GridReadEventArgs args)
     {
-        navigationManager.NavigateTo("/ReadOnly/EmployeeDetails/" + BusinessEntityId);
+        DataSourceResult result = await service.ReadVEmployeesByQueryArg(args.Request);
+
+        var data = new DataEnvelope<VEmployee>
+        {
+            CurrentPageData = result.Data.OfType<VEmployee>().ToList(),
+            TotalItemCount = result.Total
+        };
+
+        args.Data = data.CurrentPageData;
+        args.Total = data.TotalItemCount;
+    }
+
+    private async Task OnStateInitHandler(GridStateEventArgs<VEmployee> args)
+    {
+        var state = new GridState<VEmployee>
+        {
+            SortDescriptors = new List<SortDescriptor>
+            {
+                new SortDescriptor
+                {
+                    Member = "BusinessEntityId",
+                    SortDirection =  ListSortDirection.Descending
+                }
+            },
+
+            FilterDescriptors = new List<IFilterDescriptor>()
+            {
+                new CompositeFilterDescriptor()
+                {
+                    FilterDescriptors = new FilterDescriptorCollection()
+                    {
+                        new FilterDescriptor()
+                        {
+                            Member = "BusinessEntityId",
+                            Operator = FilterOperator.IsGreaterThanOrEqualTo,
+                            Value = 1,
+                            MemberType = typeof(int)
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    public async Task GridReadHandler(GridCommandEventArgs args)
+    {
+        int.TryParse(BusinessEntityId, out var businessEntityId);
+        businessEntityId = (args.Item as VEmployee).BusinessEntityId;
+
+        selectedEmployee = await service.GetEmployee(businessEntityId);
+
+        navigationManager.NavigateTo("/ReadOnly/EmployeeDetails/" + businessEntityId);
+    }
+
+    public async Task GridEditHandler(GridCommandEventArgs args)
+    {
+        int.TryParse(BusinessEntityId, out var businessEntityId);
+        businessEntityId = (args.Item as VEmployee).BusinessEntityId;
+
+        selectedEmployee = await service.GetEmployee(businessEntityId);
+
+        navigationManager.NavigateTo("/Edit/EmployeeDetails/" + businessEntityId);
+    }
+
+    public async Task GridDeleteHandler(VEmployee emp)
+    {
+        BusinessEntityId = emp.BusinessEntityId.ToString();
+        int.TryParse(BusinessEntityId, out var businessEntityId);
+
+        selectedVEmployee = service.GetEmployee_View(businessEntityId);
+    }
+
+    public void DeleteRecord(string BusinessEntityId)
+    {
+        int.TryParse(BusinessEntityId, out var businessEntityId);
+        service.DeleteEmployee(businessEntityId);
+
+        GridRef?.Rebind();
+        DeleteWindowVisible = false;
+    }
+
+    public void CancelDelete()
+    {
+        DeleteWindowVisible = false;
     }
 }

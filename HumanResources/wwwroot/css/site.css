@@ -202,3 +202,13 @@ a, .btn-link {
     margin-right: auto;
     width: 200px;
 }
+
+/* Delete Modal Popup */
+div .k-window.delete-window .k-window-titlebar {
+    background: red;
+    color: white;
+}
+
+.deleteButton-colored-icons .k-icon {
+    color:red;
+}
