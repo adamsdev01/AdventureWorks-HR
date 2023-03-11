@@ -1,0 +1,34 @@
+﻿@page "/HR"
+
+<h3 style="text-align:center"><b>HUMAN RESOURCES PORTAL</b></h3>
+
+<div class="demo-section">
+    <TelerikTabStrip @bind-ActiveTabIndex="@ActiveTabIndex">
+        <TabStripTab Title="Employees">
+           <EmployeeCard>
+
+           </EmployeeCard>
+        </TabStripTab>
+        <TabStripTab Title="Job Candidates">
+            <NewCandidateCard>
+
+            </NewCandidateCard>
+        </TabStripTab>
+        <TabStripTab Title="Departments">
+            <DepartmentCard>
+
+            </DepartmentCard>
+        </TabStripTab>
+        <TabStripTab Title="Reports">
+            <ReportsCard>
+
+            </ReportsCard>
+        </TabStripTab>
+    </TelerikTabStrip>
+</div>
+
+
+
+@code {
+    public int ActiveTabIndex { get; set; } = 0;
+}
