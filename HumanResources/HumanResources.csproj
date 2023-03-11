@@ -10,5 +10,7 @@
   <ItemGroup>
     <PackageReference Include="Telerik.UI.for.Blazor" Version="3.6.0" />
   </ItemGroup>
+  
+  <ProjectExtensions><VisualStudio><UserProperties UseCdnSupport="True" /></VisualStudio></ProjectExtensions>
 
 </Project>
