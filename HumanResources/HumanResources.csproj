@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseRazorSourceGenerator>false</UseRazorSourceGenerator>
+    <UserSecretsId>860cb116-558e-41a9-b682-72966e36a258</UserSecretsId>
   </PropertyGroup>
   
   <ItemGroup>
@@ -19,10 +20,6 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Telerik.UI.for.Blazor" Version="3.6.0" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Folder Include="Data\" />
   </ItemGroup>
   
   <ProjectExtensions><VisualStudio><UserProperties UseCdnSupport="True" /></VisualStudio></ProjectExtensions>
