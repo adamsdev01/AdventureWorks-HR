@@ -45,16 +45,16 @@
                     </div>
                     <div class="container">
                         <h5>Deleting Employee <b>@selectedVEmployee?.FirstName @selectedVEmployee?.LastName</b></h5>
+                        <p>Job Title <b>@selectedVEmployee.JobTitle</b></p>
                         <p>Are you sure you want to delete this record?</p>
                     </div>
                 </FormItems>
                 <FormButtons>
-                    <TelerikButton Icon="trash" OnClick="@((args) => DeleteRecord(BusinessEntityId))" Class="deleteButton-colored-icons">Yes</TelerikButton>
-                    <TelerikButton Icon="cancel" OnClick="CancelDelete">No</TelerikButton>
+                    <TelerikButton Icon="trash" OnClick="@((args) => DeleteRecord(BusinessEntityId))" ThemeColor="@ThemeConstants.Button.ThemeColor.Error">Yes</TelerikButton>
+                    <TelerikButton Icon="cancel" OnClick="CancelDelete" ThemeColor="@ThemeConstants.Button.ThemeColor.Warning">No</TelerikButton>
                 </FormButtons>
             </TelerikForm>
         </div>
-
     </WindowContent>
 </TelerikWindow>
 
@@ -141,7 +141,7 @@
 
         selectedEmployee = await service.GetEmployee(businessEntityId);
 
-        navigationManager.NavigateTo("/ReadOnly/EmployeeDetails/" + businessEntityId);
+        navigationManager.NavigateTo("/View/EmployeeDetails/" + businessEntityId);
     }
 
     public async Task GridEditHandler(GridCommandEventArgs args)

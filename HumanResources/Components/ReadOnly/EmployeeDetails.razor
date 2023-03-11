@@ -1,24 +1,111 @@
-﻿@page "/ReadOnly/EmployeeDetails/{BusinessEntityId:int}"
-<h3>Employee Details</h3>
+﻿@page "/View/EmployeeDetails/{BusinessEntityId:int}"
 
-@*<div class="demo-section">
-    <TelerikForm Model="@Employee">
+<div class="alert alert-dark" role="alert">
+    <div class="row">
+        <div class="col-lg-9">
+            <h3><b>EMPLOYEE PROFILE</b></h3>
+        </div>
+        <div class="col-lg-3 text-right">
+            <a class="btn btn-success btn-sm" href="/HR" role="button"><TelerikIcon Icon="arrow-left"></TelerikIcon> Back to list</a>
+        </div>
+    </div>
+</div>
+<h5>@selectedVEmployee.FirstName @selectedVEmployee.LastName</h5>
+<h6>@selectedVEmployee.JobTitle</h6>
+<hr />
+<div class="demo-section">
+    <TelerikForm Model="@employeeObj">
         <FormItems>
-            <FormItem Field="@nameof(Employee.BirthDate)" Enabled="false"></FormItem>
-            <FormItem Field="@nameof(Employee.MaritalStatus)" Enabled="false"></FormItem>
-            <FormItem Field="@nameof(Employee.Gender)" Enabled="false" />
-            <FormItem Field="@nameof(Employee.SalariedFlag)" Enabled="false" />
-            <FormItem Field="@nameof(Employee.VacationHours)" Enabled="false" />
-            <FormItem Field="@nameof(Employee.SickLeaveHours)" Enabled="false" />
+            <h5><b>Personal Information</b></h5>
+            <div class="row">
+                <div class="col-sm-2">
+                    <label>Date of Birth</label>
+                    <TelerikDateInput @bind-Value="@employeeObj.BirthDate" Enabled="false"></TelerikDateInput>
+                </div>
+                <div class="col-sm-2">
+                    <label>Gender</label>
+                    <TelerikTextBox @bind-Value="@employeeObj.Gender" Enabled="false"></TelerikTextBox>
+                </div>
+                <div class="col-sm-2">
+                    <label>Marital Status</label>
+                    <TelerikTextBox @bind-Value="@employeeObj.MaritalStatus" Enabled="false"></TelerikTextBox>
+                </div>
+            </div>
+            <br />
+            <h5><b>Payroll Information</b></h5>
+            <div class="row">
+                <div class="col-sm-2">
+                    <label>Hire Date</label>
+                    <TelerikDateInput @bind-Value="@employeeObj.HireDate" Enabled="false"></TelerikDateInput>
+                </div>
+                <div class="col-sm-2">
+                    <label>Current Employee</label>
+                    <TelerikCheckBox @bind-Value="@employeeObj.CurrentFlag" Enabled="false"></TelerikCheckBox>
+                </div>
+                <div class="col-sm-2">
+                    <label>Salaried</label>
+                    <span></span>
+                    <TelerikCheckBox @bind-Value="@employeeObj.SalariedFlag" Enabled="false"></TelerikCheckBox>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-2">
+                    <label>Vacation Hours</label>
+                    <TelerikNumericTextBox @bind-Value="@employeeObj.VacationHours" Enabled="false"></TelerikNumericTextBox>
+                </div>
+                <div class="col-sm-2">
+                    <label>Sick Leave</label>
+                    <TelerikNumericTextBox @bind-Value="@employeeObj.SickLeaveHours" Enabled="false"></TelerikNumericTextBox>
+                </div>
+            </div>
+            <br />
+            <h5><b>Department Information</b></h5>
+            <div class="row">
+                <div class="col-sm-2">
+                    <label>Department</label>
+                    <TelerikTextBox @bind-Value="@selectedDepartment.GroupName" Enabled="false"></TelerikTextBox>
+                </div>
+                <div class="col-sm-2">
+                    <label>Team</label>
+                    <TelerikTextBox @bind-Value="@selectedDepartment.Name" Enabled="false"></TelerikTextBox>
+                </div>                
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-2">
+                    <label>Start Date</label>
+                    <TelerikDateInput @bind-Value="@selectedEmployeeDepartmentHistory.StartDate" Enabled="false"></TelerikDateInput>
+                </div>
+                <div class="col-sm-2">
+                    <label>End Date</label>
+                    <TelerikDateInput @bind-Value="@selectedEmployeeDepartmentHistory.EndDate" Enabled="false"></TelerikDateInput>
+                </div>
+            </div>
+            <br />
+            <div class="row">
+                <div class="col-sm-2">
+                    <label>Work Shift</label>
+                    <TelerikTextBox @bind-Value="@selectedShift.Name" Enabled="false"></TelerikTextBox>
+                </div>              
+            </div>
         </FormItems>
+        <FormButtons>
+        </FormButtons>
     </TelerikForm>
-</div>*@
+</div>
 
 @code {
-    public Employee? Employee { get; set; }
+    public Employee? employeeObj = new Employee();
+    public VEmployee selectedVEmployee = new VEmployee();
+    public EmployeeDepartmentHistory selectedEmployeeDepartmentHistory = new EmployeeDepartmentHistory();
+    public Department selectedDepartment = new Department();
+    public Shift selectedShift = new Shift();
 
     [Parameter]
     public int BusinessEntityId { get; set; }
+
+    public int CurrentStepIndex { get; set; } = 1;
 
     protected override async Task OnInitializedAsync()
     {
@@ -27,6 +114,28 @@
 
     private async Task LoadData()
     {
-        Employee = await service.GetEmployee(BusinessEntityId);
+        employeeObj = await service.GetEmployee(BusinessEntityId);
+        selectedVEmployee = service.GetEmployee_View(BusinessEntityId);
+        selectedEmployeeDepartmentHistory = employeeObj.EmployeeDepartmentHistories.FirstOrDefault();
+        await GetEmployeeDepartmentInfo();
     }
+
+    public async Task GetEmployeeDepartmentInfo()
+    {
+        selectedEmployeeDepartmentHistory = await service.GetEmployeeDepartmentHistory(selectedEmployeeDepartmentHistory.BusinessEntityId);
+
+        if(selectedEmployeeDepartmentHistory.DepartmentId > 0)
+        {
+            selectedDepartment.DepartmentId = selectedEmployeeDepartmentHistory.DepartmentId;
+            selectedDepartment.Name = selectedEmployeeDepartmentHistory.Department.Name;
+            selectedDepartment.GroupName = selectedEmployeeDepartmentHistory.Department.GroupName;
+            selectedShift.Name = selectedEmployeeDepartmentHistory.Shift.Name;
+        }
+        await Task.FromResult(selectedDepartment.Name);
+        await Task.FromResult(selectedDepartment.GroupName);
+        await Task.FromResult(selectedShift.Name);
+
+    }
+
+
 }

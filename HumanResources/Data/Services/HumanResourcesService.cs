@@ -72,6 +72,12 @@ namespace HumanResources.Data.Services
         public async Task<Employee> GetEmployee(int businessEntityId)
         {
             return await _dbContext.Employees
+                .Include(e => e.BusinessEntity)
+                .Include(e => e.SalesPerson)
+                .Include(e => e.EmployeeDepartmentHistories)
+                .Include(e => e.EmployeePayHistories)
+                .Include(e => e.JobCandidates)
+                .Include(e => e.PurchaseOrderHeaders)
                 .FirstOrDefaultAsync(e => e.BusinessEntityId == businessEntityId);
         }
 
@@ -132,5 +138,24 @@ namespace HumanResources.Data.Services
         }
         #endregion
 
+        #region EmployeeDepartmentHistory Object
+        public async Task<EmployeeDepartmentHistory> GetEmployeeDepartmentHistory(int businessEntityId)
+        {
+            return await _dbContext.EmployeeDepartmentHistories
+                .Include(e => e.BusinessEntity)
+                .Include(e => e.Department)
+                .Include(e => e.Shift)
+                .FirstOrDefaultAsync(e => e.BusinessEntityId == businessEntityId);
+        }
+        #endregion
+
+        #region Shift Object
+        public async Task<Shift> GetShift(int shiftId)
+        {
+            return await _dbContext.Shifts
+                .Include(e => e.EmployeeDepartmentHistories)
+                .FirstOrDefaultAsync(e => e.ShiftId == shiftId);
+        }
+        #endregion
     }
 }
