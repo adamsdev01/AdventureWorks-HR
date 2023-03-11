@@ -1,0 +1,32 @@
+﻿@page "/ReadOnly/EmployeeDetails/{BusinessEntityId:int}"
+<h3>Employee Details</h3>
+
+<div class="demo-section">
+    <TelerikForm Model="@Employee">
+        <FormItems>
+            <FormItem Field="@nameof(Employee.BirthDate)" Enabled="false"></FormItem>
+            <FormItem Field="@nameof(Employee.MaritalStatus)" Enabled="false"></FormItem>
+            <FormItem Field="@nameof(Employee.Gender)" Enabled="false" />
+            <FormItem Field="@nameof(Employee.SalariedFlag)" Enabled="false" />
+            <FormItem Field="@nameof(Employee.VacationHours)" Enabled="false" />
+            <FormItem Field="@nameof(Employee.SickLeaveHours)" Enabled="false" />
+        </FormItems>
+    </TelerikForm>
+</div>
+
+@code {
+    public Employee? Employee { get; set; }
+
+    [Parameter]
+    public int BusinessEntityId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        Employee = await service.GetEmployee(BusinessEntityId);
+    }
+}

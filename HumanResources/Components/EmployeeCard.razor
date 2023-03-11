@@ -21,6 +21,7 @@
         <GridColumn Field="@nameof(VEmployee.PhoneNumberType)" Title="Type" Width="100px" />
         <GridColumn Field="@nameof(VEmployee.EmailAddress)" Title="Email Address" Width="195px" />
         <GridCommandColumn Width="100px">
+            <GridCommandButton OnClick="(() => OnClickRead())" Id="BusinessEntityId" Icon="eye" ThemeColor="@ThemeConstants.Button.ThemeColor.Warning"></GridCommandButton>
             <GridCommandButton Command="Edit" Icon="pencil" ThemeColor="@ThemeConstants.Button.ThemeColor.Primary"></GridCommandButton>
             <GridCommandButton Command="Delete" Icon="trash" ThemeColor="@ThemeConstants.Button.ThemeColor.Error"></GridCommandButton>
         </GridCommandColumn>
@@ -30,6 +31,9 @@
 @code {
     public List<VEmployee>? VEmployees { get; set; }
 
+    [Parameter]
+    public int BusinessEntityId { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await LoadData();
@@ -38,5 +42,10 @@
     private async Task LoadData()
     {
         VEmployees = await service.GetEmployees_View();
+    }
+
+    public void OnClickRead()
+    {
+        navigationManager.NavigateTo("/ReadOnly/EmployeeDetails/" + BusinessEntityId);
     }
 }
