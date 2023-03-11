@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UseRazorSourceGenerator>false</UseRazorSourceGenerator>
+    <UseRazorSourceGenerator>true</UseRazorSourceGenerator>
     <UserSecretsId>860cb116-558e-41a9-b682-72966e36a258</UserSecretsId>
   </PropertyGroup>
   
@@ -20,6 +20,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Telerik.UI.for.Blazor" Version="3.6.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="wwwroot\images\" />
   </ItemGroup>
   
   <ProjectExtensions><VisualStudio><UserProperties UseCdnSupport="True" /></VisualStudio></ProjectExtensions>
