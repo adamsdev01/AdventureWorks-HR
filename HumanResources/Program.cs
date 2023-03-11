@@ -1,4 +1,5 @@
 ﻿using HumanResources.Data.Models;
+using HumanResources.Data.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddTelerikBlazor();
+builder.Services.AddScoped<HumanResourcesService>();
 
 // Add ConnectionString
 builder.Services.AddDbContext<AdventureContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
