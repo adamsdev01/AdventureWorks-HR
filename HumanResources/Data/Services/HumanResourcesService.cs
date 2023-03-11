@@ -1,4 +1,5 @@
 ﻿using HumanResources.Data.Models;
+using HumanResources.Data.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using System;
 
@@ -12,6 +13,13 @@ namespace HumanResources.Data.Services
         {
             _dbContext = dbContext;
         }
+
+        #region Employees View Object
+        public async Task<List<VEmployee>> GetEmployees_View()
+        {
+            return await _dbContext.VEmployees.ToListAsync();
+        }
+        #endregion
 
         #region Employee Object
         public async Task<IEnumerable<Employee>> GetEmployees()
