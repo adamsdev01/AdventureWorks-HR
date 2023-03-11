@@ -174,5 +174,36 @@ namespace HumanResources.Data.Services
             return departments;
         }
         #endregion
+
+        #region JobCandidate Object
+        public async Task<DataSourceResult> ReadJobCandidatesByQueryArg(DataSourceRequest queryAttrib)
+        {
+            queryAttrib.Filters.Add(new FilterDescriptor
+            {
+                Member = "JobCandidateId"
+            });
+
+            var candidates = await _dbContext.JobCandidates
+                .Where(e => e.JobCandidateId > 1)
+                .OrderBy(e => e.JobCandidateId)
+                .ToDataSourceResultAsync(queryAttrib);
+
+            return candidates;
+        }
+
+        public JobCandidate GetJobCandidate(int jobCandidateId)
+        {
+            var data = _dbContext.JobCandidates
+                .Where(e => e.JobCandidateId == jobCandidateId)
+                .FirstOrDefault();
+
+            return data;
+        }
+
+        public async Task<List<JobCandidate>> GetJobCandidates()
+        {
+            return await _dbContext.JobCandidates.ToListAsync();
+        }
+        #endregion
     }
 }
