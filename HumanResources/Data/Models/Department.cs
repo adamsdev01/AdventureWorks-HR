@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HumanResources.Data.Models
 {
@@ -31,5 +32,9 @@ namespace HumanResources.Data.Models
         public DateTime ModifiedDate { get; set; }
 
         public virtual ICollection<EmployeeDepartmentHistory> EmployeeDepartmentHistories { get; set; }
+
+        [NotMapped]
+        //this property will contain the row index for display purposes
+        public int RowIndex { get; set; }
     }
 }
