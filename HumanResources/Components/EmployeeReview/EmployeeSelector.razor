@@ -27,8 +27,27 @@
     <h3>Next Up: <b>@Name</b></h3>
 }
 
+<br />
+<TelerikButton OnClick="@OnClickFiveRandomPerson" ThemeColor="@(ThemeConstants.Button.ThemeColor.Info)" Class="block">GENERATE 5 EMPLOYEES</TelerikButton>
+<br />
+
+@if(PersonsList == null)
+{
+    <p>Thinking...</p>
+}
+else
+{
+    @foreach (var emp in PersonsList)
+    {
+        <p>@emp.FirstName @emp.LastName</p>
+    }
+}
+
 @code {
     public string? Name;
+    public string[]? Names;
+    public Person PeopleObj = new Person();
+    public IEnumerable<Person> PersonsList = new List<Person>();
 
     protected override void OnInitialized()
     {
@@ -39,6 +58,11 @@
     {
         string person = await service.GetRandomPerson();
         Name = person;
+    }
+
+    protected async void OnClickFiveRandomPerson()
+    {
+        PersonsList = await service.GetFiveRandomEmployees();
     }
 
 }

@@ -276,22 +276,25 @@ namespace HumanResources.Data.Services
             return Name;
         }
 
-        public async Task<List<Person>> GetPeople_ReturnRandomPersonList()
+        public async Task<IEnumerable<Person>> GetFiveRandomEmployees()
         {
             // Creating object of random class
             Random random = new Random();
 
-            var randomEmployee = await _dbContext.People
+            // List of employees
+            var employees = await _dbContext.People
                 .Where(p => p.PersonType == "EM")
-                .OrderBy(random => random.BusinessEntityId)
                 .Select(o => new Person
                 {
+                    BusinessEntityId = o.BusinessEntityId,
                     FirstName = o.FirstName,
                     LastName = o.LastName,
-                    BusinessEntityId = o.BusinessEntityId
                 }).ToListAsync();
 
-            return randomEmployee;
+            // get 5 random emps from list
+            var list = employees.OrderBy(x => random.Next()).Take(5);
+
+            return list;
         }
         #endregion
     }
