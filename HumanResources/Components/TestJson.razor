@@ -1,0 +1,43 @@
+﻿@page "/TextJson"
+
+@using HumanResources.Models;
+@using System.Net;
+@using Newtonsoft.Json;
+
+<h3>TestJson</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th></th>
+            <th></th>
+        </tr>
+    </thead>
+</table>
+@foreach (var emp in PersonObj.persons)
+{
+    <tr>
+        <td>@emp.FirstName @emp.LastName</td>
+    </tr>
+    <br />
+}
+<br />
+<br />
+
+@code {
+    public Persons PersonObj = new Persons();
+
+    protected override async void OnInitialized()
+    {
+        await ReadPersonsAsync();
+    }
+
+    public async Task<Persons> ReadPersonsAsync()
+    {
+        var webClient = new WebClient();
+        var json = webClient.DownloadString(@"persons.json");
+        var items = JsonConvert.DeserializeObject<Persons>(json);
+        PersonObj = items;
+        return PersonObj;
+    }
+}
