@@ -2,6 +2,7 @@
 using HumanResources.Data.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Linq;
 using Telerik.DataSource;
 using Telerik.DataSource.Extensions;
 
@@ -203,6 +204,94 @@ namespace HumanResources.Data.Services
         public async Task<List<JobCandidate>> GetJobCandidates()
         {
             return await _dbContext.JobCandidates.ToListAsync();
+        }
+        #endregion
+
+        #region Person Object
+        public async Task<List<Person>> GetPeople()
+        {
+            return await _dbContext.People.ToListAsync();
+        }
+
+        public async Task<List<Person>> GetPeople_CurrentEmployeesOnly()
+        {
+            return await _dbContext.People
+                .Where(p => p.PersonType == "EM")
+                .ToListAsync();
+        }
+
+        public async Task<int> GetPeople_EmployeesCount()
+        {
+            var people = await _dbContext.People
+                .Where(p => p.PersonType == "EM")
+                .CountAsync();
+
+            return people;
+        }
+
+        public async Task<int> GetPeople_ReturnOneRandomPerson()
+        {
+            // Creating object of random class
+            Random random = new Random();
+
+            var randomEmployees = await _dbContext.People
+                .Where(p => p.PersonType == "EM")
+                .OrderBy(random => random.BusinessEntityId)
+                .Select(o => new Person
+                {
+                    FirstName = o.FirstName,
+                    LastName = o.LastName,
+                    BusinessEntityId = o.BusinessEntityId
+                }).ToListAsync();
+
+            var randomEmployee = random.Next(randomEmployees.Count);
+
+            return randomEmployee;
+        }
+
+        /// <summary>
+        /// Generate Random person from employees list
+        /// </summary>
+        /// <returns></returns>
+        public async Task<string> GetRandomPerson()
+        {
+            // Creating object of random class
+            Random random = new Random();
+
+            var randomEmployees = await _dbContext.People
+                .Where(p => p.PersonType == "EM")
+                .Select(o => new Person
+                {
+                    FirstName = o.FirstName,
+                    LastName = o.LastName,
+                    BusinessEntityId = o.BusinessEntityId
+                }).ToListAsync();
+
+            var randomEmployee = random.Next(randomEmployees.Count);
+
+            string Name = "";
+
+            Name = (string)randomEmployees[randomEmployee].FirstName + " " + (string)randomEmployees[randomEmployee].LastName;
+
+            return Name;
+        }
+
+        public async Task<List<Person>> GetPeople_ReturnRandomPersonList()
+        {
+            // Creating object of random class
+            Random random = new Random();
+
+            var randomEmployee = await _dbContext.People
+                .Where(p => p.PersonType == "EM")
+                .OrderBy(random => random.BusinessEntityId)
+                .Select(o => new Person
+                {
+                    FirstName = o.FirstName,
+                    LastName = o.LastName,
+                    BusinessEntityId = o.BusinessEntityId
+                }).ToListAsync();
+
+            return randomEmployee;
         }
         #endregion
     }

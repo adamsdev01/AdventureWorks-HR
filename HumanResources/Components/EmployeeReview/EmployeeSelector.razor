@@ -1,0 +1,44 @@
+﻿@page "/Selector"
+
+<style>
+
+    .block {
+        display: block;
+        width: 25%;
+        border: none;
+        padding: 14px 28px;
+        font-size: 24px;
+        cursor: pointer;
+        text-align: center;
+    }
+</style>
+
+<h3 style="text-align:center"><b>Random Employee Selector</b></h3>
+<h4 style="text-align:center">Employee One On One</h4>
+
+<br />
+<TelerikButton OnClick="@OnClickRandomPerson" ThemeColor="@(ThemeConstants.Button.ThemeColor.Primary)" Class="block">GENERATE EMPLOYEE</TelerikButton>
+<br />
+@if(Name == null)
+{
+    <p>Thinking...</p>
+}else
+{
+    <h3>Next Up: <b>@Name</b></h3>
+}
+
+@code {
+    public string? Name;
+
+    protected override void OnInitialized()
+    {
+        OnClickRandomPerson();
+    }
+
+    protected async void OnClickRandomPerson()
+    {
+        string person = await service.GetRandomPerson();
+        Name = person;
+    }
+
+}
