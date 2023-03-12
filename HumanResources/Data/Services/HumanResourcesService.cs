@@ -297,5 +297,28 @@ namespace HumanResources.Data.Services
             return list;
         }
         #endregion
+
+        #region JSON
+        public async Task<IEnumerable<Person>> GetRandomEmployeesFromJson()
+        {
+            // Creating object of random class
+            Random random = new Random();
+
+            // List of employees
+            var employees = await _dbContext.People
+                .Where(p => p.PersonType == "EM")
+                .Select(o => new Person
+                {
+                    BusinessEntityId = o.BusinessEntityId,
+                    FirstName = o.FirstName,
+                    LastName = o.LastName,
+                }).ToListAsync();
+
+            // get 5 random emps from list
+            var list = employees.OrderBy(x => random.Next()).Take(5);
+
+            return list;
+        }
+        #endregion
     }
 }

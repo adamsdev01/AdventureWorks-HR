@@ -4,28 +4,51 @@
 @using System.Net;
 @using Newtonsoft.Json;
 
-<h3>TestJson</h3>
+<br />
+<h3 style="text-align:center">Random Employee Generator from JSON</h3>
+<TelerikButton OnClick="@OnClickFiveRandomPerson" ThemeColor="@(ThemeConstants.Button.ThemeColor.Info)" Class="block">GENERATE 5 EMPLOYEES</TelerikButton>
+<br />
 
-<table>
+@if (PersonsList == null)
+{
+    <p>Thinking...</p>
+}
+else
+{
+    @foreach (var emp in PersonsList)
+    {
+        <p>@emp.FirstName @emp.LastName</p>
+    }
+}
+<hr />
+<h3 style="text-align:center">Read Employees from JSON</h3>
+
+<table class="table">
     <thead>
         <tr>
-            <th></th>
-            <th></th>
+            <th scope="col">Employees</th>
         </tr>
     </thead>
+    <tbody>
+        @foreach (var emp in PersonObj.persons)
+        {
+            <tr>
+                <td>@emp.FirstName @emp.LastName</td>
+                <td><TelerikButton Icon="eye" OnClick="@((args) => ViewDetail(emp.BusinessEntityId.ToString()))" Id="@emp.BusinessEntityId.ToString()"></TelerikButton></td>
+            </tr>
+        }
+        <tr>----------------------------------------------------------</tr>
+        <tr>----------------------------------------------------------</tr>
+    </tbody>
 </table>
-@foreach (var emp in PersonObj.persons)
-{
-    <tr>
-        <td>@emp.FirstName @emp.LastName</td>
-    </tr>
-    <br />
-}
-<br />
-<br />
 
 @code {
+    [Parameter]
+    public string? BusinessEntityId { get; set; }
     public Persons PersonObj = new Persons();
+    public PersonData personData = new PersonData();
+
+    public IEnumerable<PersonData> PersonsList = new List<PersonData>();
 
     protected override async void OnInitialized()
     {
@@ -39,5 +62,31 @@
         var items = JsonConvert.DeserializeObject<Persons>(json);
         PersonObj = items;
         return PersonObj;
+    }
+
+    public async Task ViewDetail(string BusinessEntityId)
+    {
+        int.TryParse(BusinessEntityId, out var businessEntityId);
+
+        navigationManager.NavigateTo("/Json/Detail/" + businessEntityId);
+    }
+
+    protected async void OnClickFiveRandomPerson()
+    {
+        PersonsList = await GetRandomEmployeesFromJson();
+    }
+
+    public async Task<IEnumerable<PersonData>> GetRandomEmployeesFromJson()
+    {
+        // Creating object of random class
+        Random random = new Random();
+
+        // List of employees
+        var employees = await ReadPersonsAsync();
+
+        // get 5 random emps from list
+        var list = employees.persons.OrderBy(x => random.Next()).Take(5);
+
+        return list;
     }
 }
